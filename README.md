@@ -2,8 +2,7 @@
 
 ![Swift Version](https://img.shields.io/badge/Swift-5.1-blue.svg)
 
-inspired by [jvm-on-clj](https://github.com/rinx/jvm-on-clj).
-currently, it only supports to run "Hello.java".
+inspired by [jvm-on-clj](https://github.com/rinx/jvm-on-clj)
 
 ## Build
 ```sh
