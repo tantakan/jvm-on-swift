@@ -2,11 +2,11 @@ import Foundation
 
 private func main(arguments: [String]) {
     let arguments = arguments.dropFirst()
-    guard let path = arguments.first else {
-        return
+    guard let path = arguments.first, let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
+        fatalError("Cannot load file")
     }
-    let data = try! Data(contentsOf: URL(fileURLWithPath: path))
-    let _ = JavaClass(data)
+    let javaClass = JavaClass(data)
+    javaClass.execute()
 }
 
 func printData(_ data: Data) {

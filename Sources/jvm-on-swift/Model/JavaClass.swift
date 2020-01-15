@@ -1,6 +1,6 @@
 import Foundation
 
-struct JavaClass {
+class JavaClass {
     let magic: Data
     let minor_version: Data
     let major_version: Data
@@ -73,5 +73,16 @@ struct JavaClass {
             attributes.append(attribute)
         }
         self.attributes = attributes
+    }
+}
+
+extension JavaClass {
+    func execute() {
+        methods.forEach { method in
+            let pool = constant_pool.first {
+                ($0 as? ConstantPoolNameAndType)?.name_index == method.name_index
+            }
+            printData(pool!.info)
+        }
     }
 }
