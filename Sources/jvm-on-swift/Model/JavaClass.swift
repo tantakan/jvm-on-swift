@@ -27,7 +27,7 @@ struct JavaClass {
         constant_pool_count = classData.pop(2)
         var constant_pool: [ConstantPool] = []
         for _ in 1..<constant_pool_count {
-            let tag = ConstantPoolTag(classData.pop())
+            let tag = ConstantPoolTag(classData.pop(1))
             let type = tag.infoType
             let constant = type.init(tag, classData.pop(type.infoBytes))
             constant_pool.append(constant)

@@ -14,8 +14,4 @@ extension Data {
     mutating func pop(_ bytes: Int) -> Int {
         return Int(pop(bytes).compactMap({ String(format: "%02d", $0)}).joined()) ?? 0
     }
-    
-    mutating func pop() -> UInt8 {
-        return popFirst() ?? 0
-    }
 }
