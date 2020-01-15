@@ -5,12 +5,17 @@ import PackageDescription
 
 let package = Package(
     name: "jvm-on-swift",
+    dependencies: [],
     targets: [
         .target(
             name: "jvm-on-swift",
-            dependencies: []),
+            dependencies: []
+        ),
         .testTarget(
             name: "jvm-on-swiftTests",
-            dependencies: ["jvm-on-swift"]),
+            dependencies: [
+                "jvm-on-swift"
+            ]
+        ),
     ]
 )
