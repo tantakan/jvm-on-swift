@@ -14,9 +14,9 @@ struct JavaClass {
     let fields_count: Int
     let fields: [Data]
     let methods_count: Int
-    let methods: [Data]
+    let methods: [MethodInfo]
     let attributes_count: Int
-    let attributes: Data
+    let attributes: [AttributeInfo]
     
     init(_ data: Data) {
         var classData = data
@@ -24,7 +24,7 @@ struct JavaClass {
         minor_version = classData.pop(2)
         major_version = classData.pop(2)
         
-        constant_pool_count = Int(classData.pop(2).compactMap({ String(format: "%02d", $0)}).joined()) ?? 0
+        constant_pool_count = classData.pop(2)
         var constant_pool: [ConstantPool] = []
         for _ in 1..<constant_pool_count {
             let tag = ConstantPoolTag(classData.pop())
@@ -41,26 +41,37 @@ struct JavaClass {
         this_class = classData.pop(2)
         super_class = classData.pop(2)
         
-        interfaces_count = Int(classData.pop(2).compactMap({ String(format: "%02d", $0)}).joined()) ?? 0
+        interfaces_count = classData.pop(2)
         var interfaces: [Data] = []
         for _ in 0..<interfaces_count {
             interfaces.append(classData.pop(2))
         }
         self.interfaces = interfaces
         
-        fields_count = Int(classData.pop(2).compactMap({ String(format: "%02d", $0)}).joined()) ?? 0
+        fields_count = classData.pop(2)
         // TODO: Implement fields later
         fields = []
         
-        methods_count = Int(classData.pop(2).compactMap({ String(format: "%02d", $0)}).joined()) ?? 0
-        var methods: [Data] = []
-        print(methods_count)
+        methods_count = classData.pop(2)
+        var methods: [MethodInfo] = []
         for _ in 0..<methods_count {
-            methods.append(classData.pop(2))
+            var method = MethodInfo(classData.pop(8))
+            for _ in 0..<method.attributes_count {
+                var attribute = AttributeInfo(classData.pop(6))
+                attribute.initInfo(classData.pop(attribute.attribute_length))
+                method.addAttributeInfo(attribute)
+            }
+            methods.append(method)
         }
         self.methods = methods
         
-        attributes_count = Int(classData.pop(2).compactMap({ String(format: "%02d", $0)}).joined()) ?? 0
-        attributes = data
+        attributes_count = classData.pop(2)
+        var attributes: [AttributeInfo] = []
+        for _ in 0..<attributes_count {
+            var attribute = AttributeInfo(classData.pop(6))
+            attribute.initInfo(classData.pop(attribute.attribute_length))
+            attributes.append(attribute)
+        }
+        self.attributes = attributes
     }
 }

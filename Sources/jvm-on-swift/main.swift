@@ -6,9 +6,7 @@ private func main(arguments: [String]) {
         return
     }
     let data = try! Data(contentsOf: URL(fileURLWithPath: path))
-    let jClass = JavaClass(data)
-    printData(data)
-    printData(jClass.this_class)
+    let _ = JavaClass(data)
 }
 
 func printData(_ data: Data) {
