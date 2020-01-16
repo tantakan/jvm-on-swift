@@ -24,10 +24,10 @@ class JavaClass {
         minor_version = classData.pop(2)
         major_version = classData.pop(2)
         
-        constant_pool_count = classData.pop(2)
-        var constant_pool: [ConstantPool] = []
+        constant_pool_count = classData.pop(2).toInt()
+        var constant_pool: [ConstantPool] = [ConstantPool()]
         for _ in 1..<constant_pool_count {
-            let tag = ConstantPoolTag(classData.pop(1))
+            let tag = ConstantPoolTag(classData.pop(1).toInt())
             let type = tag.infoType
             let constant = type.init(tag, classData.pop(type.infoBytes))
             constant_pool.append(constant)
@@ -41,23 +41,23 @@ class JavaClass {
         this_class = classData.pop(2)
         super_class = classData.pop(2)
         
-        interfaces_count = classData.pop(2)
+        interfaces_count = classData.pop(2).toInt()
         var interfaces: [Data] = []
         for _ in 0..<interfaces_count {
             interfaces.append(classData.pop(2))
         }
         self.interfaces = interfaces
         
-        fields_count = classData.pop(2)
+        fields_count = classData.pop(2).toInt()
         // TODO: Implement fields later
         fields = []
         
-        methods_count = classData.pop(2)
+        methods_count = classData.pop(2).toInt()
         var methods: [MethodInfo] = []
         for _ in 0..<methods_count {
             var method = MethodInfo(classData.pop(8))
             for _ in 0..<method.attributes_count {
-                var attribute = AttributeInfo(classData.pop(6))
+                let attribute = AttributeInfo(classData.pop(6))
                 attribute.initInfo(classData.pop(attribute.attribute_length))
                 method.addAttributeInfo(attribute)
             }
@@ -65,24 +65,66 @@ class JavaClass {
         }
         self.methods = methods
         
-        attributes_count = classData.pop(2)
+        attributes_count = classData.pop(2).toInt()
         var attributes: [AttributeInfo] = []
         for _ in 0..<attributes_count {
-            var attribute = AttributeInfo(classData.pop(6))
+            let attribute = AttributeInfo(classData.pop(6))
             attribute.initInfo(classData.pop(attribute.attribute_length))
             attributes.append(attribute)
         }
         self.attributes = attributes
+        
+        guard "cafebabe" == magic.toHexString() else {
+            fatalError("Illegal class data")
+        }
+        
+        guard classData.popFirst() == nil else {
+            fatalError("Parse error")
+        }
     }
 }
 
 extension JavaClass {
     func execute() {
-        methods.forEach { method in
-            let pool = constant_pool.first {
-                ($0 as? ConstantPoolNameAndType)?.name_index == method.name_index
+        // Class info
+        constant_pool
+            .compactMap({ pool -> ConstantPoolClass? in
+                return pool as? ConstantPoolClass
+            })
+            .compactMap({ pool -> ConstantPoolUtf8? in
+                return constant_pool[pool.name_index] as? ConstantPoolUtf8
+            })
+            .forEach({ pool in
+                print(pool.str)
+            })
+        
+        // Method info
+        methods
+            .compactMap({ method -> ConstantPoolUtf8? in
+                return constant_pool[method.name_index] as? ConstantPoolUtf8
+            })
+            .forEach({ pool in
+                print(pool.str)
+            })
+        
+        guard let mainMethod = findMainMethod() else {
+            return
+        }
+        
+        print(mainMethod.attributes)
+        mainMethod
+            .attributes
+            .forEach({ attribute in
+                printData(attribute.info)
+            })
+    }
+    
+    func findMainMethod() -> MethodInfo? {
+        return methods.first { method -> Bool in
+            guard let pool = constant_pool[method.name_index] as? ConstantPoolUtf8 else {
+                return false
             }
-            printData(pool!.info)
+            return pool.str == "main"
         }
     }
 }

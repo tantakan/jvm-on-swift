@@ -4,14 +4,27 @@ extension Data {
     mutating func pop(_ bytes: Int) -> Data {
         var result: [UInt8] = []
         for _ in 0..<bytes {
-            if let element = popFirst() {
-                result.append(element)
+            guard let byte = popFirst() else {
+                fatalError("no data")
             }
+            result.append(byte)
         }
         return Data(result)
     }
     
-    mutating func pop(_ bytes: Int) -> Int {
-        return Int(pop(bytes).compactMap({ String(format: "%02d", $0)}).joined()) ?? 0
+    func toInt() -> Int {
+        return Int(toString()) ?? 0
+    }
+    
+    func toString() -> String {
+        return compactMap({ String(format: "%02d", $0)}).joined()
+    }
+    
+    func toHexString() -> String {
+        return compactMap({ String(format: "%02x", $0)}).joined()
+    }
+    
+    func toEncodedString() -> String {
+        return String(data: self, encoding: .utf8) ?? ""
     }
 }

@@ -28,4 +28,9 @@ class ConstantPool: ConstantPoolProtocol {
         self.tag = tag
         info = data
     }
+    
+    init() {
+        tag = .init(-1)
+        info = Data()
+    }
 }

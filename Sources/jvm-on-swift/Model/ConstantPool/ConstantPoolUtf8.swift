@@ -2,7 +2,7 @@ import Foundation
 
 class ConstantPoolUtf8: ConstantPool {
     let length: Int
-    var bytes: Data!
+    var str: String = ""
     
     override class var infoBytes: Int {
         return 2
@@ -19,6 +19,6 @@ class ConstantPoolUtf8: ConstantPool {
     
     override func loadMore(_ data: Data) {
         super.loadMore(data)
-        bytes = data
+        str = data.toEncodedString()
     }
 }

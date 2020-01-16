@@ -1,8 +1,8 @@
 import Foundation
 
 class ConstantPoolNameAndType: ConstantPool {
-    var name_index: Data
-    var descriptor_index: Data
+    var name_index: Int
+    var descriptor_index: Int
     
     override class var infoBytes: Int {
         return 4
@@ -10,9 +10,8 @@ class ConstantPoolNameAndType: ConstantPool {
     
     required init(_ tag: ConstantPoolTag, _ data: Data) {
         var poolData = data
-        name_index = poolData.pop(2)
-        descriptor_index = poolData.pop(2)
-        
+        name_index = poolData.pop(2).toInt()
+        descriptor_index = poolData.pop(2).toInt()
         super.init(tag, data)
     }
 }
