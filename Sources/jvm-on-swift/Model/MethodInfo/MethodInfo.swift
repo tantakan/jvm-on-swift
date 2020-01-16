@@ -5,7 +5,7 @@ struct MethodInfo {
     var name_index: Int
     var descriptor_index: Int
     var attributes_count: Int
-    var attributes: [AttributeInfo]
+    var attributes: [CodeAttributeInfo]
     
     init(_ data: Data) {
         var methodInfoData = data
@@ -16,7 +16,7 @@ struct MethodInfo {
         attributes = []
     }
     
-    mutating func addAttributeInfo(_ info: AttributeInfo) {
+    mutating func addAttributeInfo(_ info: CodeAttributeInfo) {
         attributes.append(info)
     }
 }

@@ -49,21 +49,36 @@ class CodeAttributeInfo: AttributeInfo {
     
     override func initInfo(_ info: Data) {
         var codeData = info
-        attribute_name_index = codeData.pop(2).toInt()
-        attribute_length = codeData.pop(4).toInt()
         max_stack = codeData.pop(2)
         max_locals = codeData.pop(2)
         code_length = codeData.pop(4).toInt()
         code = codeData.pop(code_length)
         
         exception_table_length = codeData.pop(2).toInt()
-        // TODO: Implement later
-        exception_table = []
+        for _ in 0..<exception_table_length {
+            exception_table.append(ExceptionTable(codeData.pop(8)))
+        }
         
         attributes_count = codeData.pop(2).toInt()
-        // TODO: Implement later
-        attributes = []
+        for _ in 0..<exception_table_length {
+            let attribute = AttributeInfo(codeData.pop(6))
+            attribute.initInfo(codeData.pop(attribute.attribute_length))
+            attributes.append(attribute)
+        }
     }
 }
 
-struct ExceptionTable {}
+struct ExceptionTable {
+    var start_pc: Data
+    var end_pc: Data
+    var handler_pc: Data
+    var catch_type: Data
+    
+    init(_ data: Data) {
+        var tableData = data
+        start_pc = tableData.pop(2)
+        end_pc = tableData.pop(2)
+        handler_pc = tableData.pop(2)
+        catch_type = tableData.pop(2)
+    }
+}

@@ -57,7 +57,7 @@ class JavaClass {
         for _ in 0..<methods_count {
             var method = MethodInfo(classData.pop(8))
             for _ in 0..<method.attributes_count {
-                let attribute = AttributeInfo(classData.pop(6))
+                let attribute = CodeAttributeInfo(classData.pop(6))
                 attribute.initInfo(classData.pop(attribute.attribute_length))
                 method.addAttributeInfo(attribute)
             }
@@ -75,7 +75,7 @@ class JavaClass {
         self.attributes = attributes
         
         guard "cafebabe" == magic.toHexString() else {
-            fatalError("Illegal class data")
+            fatalError("Illegal class data \(magic.toHexString())")
         }
         
         guard classData.popFirst() == nil else {
@@ -115,8 +115,31 @@ extension JavaClass {
         mainMethod
             .attributes
             .forEach({ attribute in
-                printData(attribute.info)
+                executeCode(attribute.code)
             })
+    }
+    
+    func executeCode(_ code: Data) {
+        printData(code)
+        var codeData = code
+        while var byte = codeData.popFirst() {
+            let instruction = Data(bytes: &byte, count: 1).toInt()
+            switch instruction {
+            case 0x12:  // ldc
+                let operand = codeData.pop(1)
+                printData(operand)
+            case 0xb1:  // return
+                return
+            case 0xb2:  // getstatic
+                let operand = codeData.pop(2)
+                printData(operand)
+            case 0xb6:  // invokevirtual
+                let operand = codeData.pop(2)
+                printData(operand)
+            default:
+                fatalError("Unknown instruction \(instruction)")
+            }
+        }
     }
     
     func findMainMethod() -> MethodInfo? {
