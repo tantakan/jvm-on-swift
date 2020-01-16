@@ -4,7 +4,13 @@
 
 inspired by [jvm-on-clj](https://github.com/rinx/jvm-on-clj)
 
-## Build
+## Build & Run
 ```sh
 $ swift build
+$ .build/debug/jvm-on-swift Sample/Hello.class
+```
+
+## Benchmark
+```sh
+$ bash bench.sh
 ```
